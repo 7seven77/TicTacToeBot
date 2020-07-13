@@ -5,6 +5,11 @@ import random
 from discord.ext import commands
 from dotenv import load_dotenv
 
+## Functions
+
+def isSet(variable):
+    return variable in locals() or variable in globals()
+
 # This is what a command must start with
 botPrefix = '7'
 
@@ -24,9 +29,9 @@ async def hello(ctx):
 @bot.command(name='status', help='Show the status of the game')
 async def status(ctx):
     # If the value has not been set yet, a game is not being played
-    try:
-        if (board):
-            print("Value has been set");
-    except NameError:
+    if not isSet('board'):
         await ctx.send("No game is being played")
+    else:
+        print("status");
+        
 bot.run(TOKEN)
