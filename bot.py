@@ -1,5 +1,6 @@
 # bot.py
 import os
+import random
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -13,7 +14,9 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(command_prefix=botPrefix)
 
 @bot.command(name='hello', help='Says hello!')
-async def hellp(ctx):
-    await ctx.send("Hey");
+async def hello(ctx):
+    greetings = ["Hey {}!", "Hello {}", "Hey {}, how are you doing?",
+                 "Yo {}", "Salam {}", "Allo {}"]
+    await ctx.send(random.choice(greetings).format(ctx.author.mention));
 
 bot.run(TOKEN)
