@@ -31,6 +31,9 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(command_prefix=botPrefix)
 
 bot.board = None
+bot.challenger = None
+bot.opponent = None
+bot.turn = None
 
 # Initialise the bot when it first becomes ready
 @bot.event
@@ -62,12 +65,31 @@ async def start(ctx, other):
         taggerID = str(ctx.author.id)
         botID = str(bot.user.id)
         if (taggedID == taggerID):
-            await ctx.send('You cannot tag yourself')
+            await ctx.send('You cannot play against yourself')
             return
         elif (taggedID == botID):
             await ctx.send('Sorry, I don\'t know how to play');
             return
         bot.board = '.........'
+        bot.challenger = taggerID
+        bot.opponent = taggedID
+        bot.turn = 1
         await ctx.send('Starting a game')
 
+# Play the game
+@bot.command(name='play', help='Take your turn')
+async def play(ctx, move):
+    if bot.board == None:
+        await ctx.send('No one has started a game')
+        return
+    if bot.turn == 1:
+        expectedID = bot.opponent
+    else:
+        expectedID = bot.challenger
+    taggerID = str(ctx.author.id)
+    if (taggerID != expectedID):
+        await ctx.send('It is not your turn')
+        return
+    bot.turn *= -1;
+    await ctx.send('Move made')
 bot.run(TOKEN)
