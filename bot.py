@@ -3,6 +3,8 @@ import os
 import random
 import re
 
+import discord
+
 from NaCMatch import NaCMatch
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -49,6 +51,7 @@ bot.match = None
 # Initialise the bot when it first becomes ready
 @bot.event
 async def on_ready():
+    await bot.change_presence(activity=discord.Game(name="Noughts and Crosses 7help"))
     print("Ready")
 
 # Greets the user when they call it
