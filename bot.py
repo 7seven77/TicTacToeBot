@@ -21,7 +21,19 @@ def getBoard():
         if (newRow % 3) == 0:
             display += "\n"
     return display
-    
+
+async def showBoardState(ctx):
+    if bot.board == None:
+        await ctx.send("No game is being played")
+    else:
+        if bot.turn == 1:
+            user = await bot.fetch_user(bot.opponent)
+        else:
+            user = await bot.fetch_user(bot.challenger)
+        await ctx.send('It\'s ' + user.mention + '\'s turn \n')
+        await ctx.send(getBoard())
+
+
 # This is what a command must start with
 botPrefix = '7'
 
@@ -51,10 +63,7 @@ async def hello(ctx):
 # Displays the status of the game
 @bot.command(name='status', help='Show the status of the game')
 async def status(ctx):
-    if bot.board == None:
-        await ctx.send("No game is being played")
-    else:
-        await ctx.send(getBoard())
+    await showBoardState(ctx)
 
 # Start a game
 @bot.command(name='start', help='Start a game')
@@ -105,5 +114,5 @@ async def play(ctx, move):
     board = board[:index] + icon + board[index + 1:]
     bot.board = board
     bot.turn *= -1;
-    await ctx.send('Move made')
+    await showBoardState(ctx)
 bot.run(TOKEN)
