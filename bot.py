@@ -34,6 +34,7 @@ bot.board = None
 bot.challenger = None
 bot.opponent = None
 bot.turn = None
+bot.validMoves = ['1', '2' ,'3', '4', '5', '6', '7', '8', '9']
 
 # Initialise the bot when it first becomes ready
 @bot.event
@@ -73,7 +74,8 @@ async def start(ctx, other):
         bot.board = '.........'
         bot.challenger = taggerID
         bot.opponent = taggedID
-        bot.turn = 1
+        bot.turn = -1
+        bot.validMoves = ['1', '2' ,'3', '4', '5', '6', '7', '8', '9']
         await ctx.send('Starting a game')
 
 # Play the game
@@ -90,6 +92,18 @@ async def play(ctx, move):
     if (taggerID != expectedID):
         await ctx.send('It is not your turn')
         return
+    if not move in bot.validMoves:
+        await ctx.send('This is not a valid move')
+        return
+    bot.validMoves.remove(move)
+    if bot.turn == 1:
+        icon = 'x'
+    else:
+        icon = 'o'
+    index = int(move) - 1
+    board = bot.board
+    board = board[:index] + icon + board[index + 1:]
+    bot.board = board
     bot.turn *= -1;
     await ctx.send('Move made')
 bot.run(TOKEN)
