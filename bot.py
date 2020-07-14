@@ -6,7 +6,18 @@ import re
 from discord.ext import commands
 from dotenv import load_dotenv
 
-## Functions
+### Functions
+
+## functions
+
+# If the game is complete, return the token that has won
+def victory(string):
+    win = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
+           [1, 4, 7], [2, 5, 8], [3, 6, 9],
+           [1, 5, 9], [3, 5, 7]]
+    for combo in win:
+        if string[combo[0] - 1] == string[combo[1] - 1] and string[combo[0] - 1] == string[combo[2] - 1] and string[combo[2] - 1] != '.':
+            return string[combo[0] - 1]
 
 # Return the board in a printable format
 def getBoard():
@@ -21,6 +32,8 @@ def getBoard():
         if (newRow % 3) == 0:
             display += "\n"
     return display
+
+## async functions
 
 async def showBoardState(ctx):
     if bot.board == None:
