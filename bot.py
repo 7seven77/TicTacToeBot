@@ -3,6 +3,7 @@ import os
 import random
 import re
 
+from NaCMatch import NaCMatch
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -10,21 +11,11 @@ from dotenv import load_dotenv
 
 ## functions
 
-# If the game is complete, return the token that has won
-def victory(string):
-    win = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
-           [1, 4, 7], [2, 5, 8], [3, 6, 9],
-           [1, 5, 9], [3, 5, 7]]
-    for combo in win:
-        if string[combo[0] - 1] == string[combo[1] - 1] and string[combo[0] - 1] == string[combo[2] - 1] and string[combo[2] - 1] != '.':
-            return string[combo[0] - 1]
-    return '.'
-
 # Return the board in a printable format
 def getBoard():
     newRow = 0;
     display = '';
-    for character in bot.board:
+    for character in bot.match.board:
         if character == '.':
             display += ':white_large_square:'
         else:
@@ -37,14 +28,11 @@ def getBoard():
 ## async functions
 
 async def showBoardState(ctx):
-    if bot.board == None:
+    if bot.match == None:
         await ctx.send("No game is being played")
     else:
-        if bot.turn == 1:
-            user = await bot.fetch_user(bot.opponent)
-        else:
-            user = await bot.fetch_user(bot.challenger)
-        await ctx.send('It\'s ' + user.mention + '\'s turn \n')
+        user = await bot.fetch_user(bot.match.getCurrentPlayer())
+        await ctx.send('Its ' + user.mention + 's turn')
         await ctx.send(getBoard())
 
 
@@ -56,11 +44,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix=botPrefix)
 
-bot.board = None
-bot.challenger = None
-bot.opponent = None
-bot.turn = None
-bot.validMoves = ['1', '2' ,'3', '4', '5', '6', '7', '8', '9']
+bot.match = None
 
 # Initialise the bot when it first becomes ready
 @bot.event
@@ -82,7 +66,7 @@ async def status(ctx):
 # Start a game
 @bot.command(name='start', help='Start a game')
 async def start(ctx, other):
-    if bot.board != None:
+    if bot.match != None:
         await ctx.send("There is a game already being played")
     else:
         taggedID = str(re.sub(r'[^\w]', '', other))
@@ -94,50 +78,31 @@ async def start(ctx, other):
         elif (taggedID == botID):
             await ctx.send('Sorry, I don\'t know how to play');
             return
-        bot.board = '.........'
-        bot.challenger = taggerID
-        bot.opponent = taggedID
-        bot.turn = -1
-        bot.validMoves = ['1', '2' ,'3', '4', '5', '6', '7', '8', '9']
+        bot.match = NaCMatch(taggerID, taggedID)
         await ctx.send('Starting a game')
+        await showBoardState(ctx)
 
 # Play the game
 @bot.command(name='play', help='Take your turn')
 async def play(ctx, move):
-    if bot.board == None:
+    if bot.match == None:
         await ctx.send('No one has started a game')
         return
-    if bot.turn == 1:
-        expectedID = bot.opponent
-    else:
-        expectedID = bot.challenger
     taggerID = str(ctx.author.id)
-    if (taggerID != expectedID):
+    turn = bot.match.takeTurn(taggerID, move)
+    if turn == 'Player':
         await ctx.send('It is not your turn')
-        return
-    if not move in bot.validMoves:
-        await ctx.send('This is not a valid move')
-        return
-    bot.validMoves.remove(move)
-    if bot.turn == 1:
-        icon = 'x'
+    elif turn == 'Move':
+        await ctx.send('That is not a valid move')
     else:
-        icon = 'o'
-    index = int(move) - 1
-    board = bot.board
-    board = board[:index] + icon + board[index + 1:]
-    bot.board = board
-    bot.turn *= -1;
-    await showBoardState(ctx)
-    victor = victory(bot.board)
-    if victor != '.':
-        if bot.turn == -1:
-            user = await bot.fetch_user(bot.opponent)
+        if bot.match.isOver():
+            winner = bot.match.getVictor()
+            if winner == '.':
+                await ctx.send('The match is a draw')
+            else:
+                bot.match = None
+                user = await bot.fetch_user(winner)
+                await ctx.send('{} wins the game'.format(user.mention))
         else:
-            user = await bot.fetch_user(bot.challenger)
-        bot.board = None
-        await ctx.send('{} has won'.format(user.mention))
-    if len(bot.validMoves) == 0:
-        bot.board = None
-        await ctx.send('The game is a draw')
+            await showBoardState(ctx)
 bot.run(TOKEN)

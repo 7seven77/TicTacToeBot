@@ -49,6 +49,13 @@ class NaCMatch():
         else:
             return self.challenger
 
+    # Get the player who's turn it is next
+    def getNextPlayer(self):
+        if self.turn == 1:
+            return self.challenger
+        else:
+            return self.opponent
+    
     # Returns the victor if there is one
     # Returns '.' if there isn't
     def getVictor(self):
