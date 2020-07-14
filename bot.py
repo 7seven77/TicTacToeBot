@@ -26,7 +26,7 @@ def getBoard():
         if (newRow % 3) == 0:
             display += "\n"
     return display
-
+    
 ## async functions
 
 async def showBoardState(ctx):
@@ -37,7 +37,13 @@ async def showBoardState(ctx):
         await ctx.send('Its ' + user.mention + 's turn')
         await ctx.send(getBoard())
 
-
+async def isValidID(test):
+    try:
+        user = await bot.fetch_user(test)
+        return True
+    except:
+        return False
+    
 # This is what a command must start with
 botPrefix = '7'
 
@@ -54,7 +60,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="Noughts and Crosses 7help"))
     print("Ready")
 
-# Greets the user when they call it
+# Greets the user when they call it   
 @bot.command(name='hello', help='Says hello!')
 async def hello(ctx):
     greetings = ["Hey {}!", "Hello {}", "Hey {}, how are you doing?",
@@ -76,6 +82,9 @@ async def start(ctx, other):
         await ctx.send("There is a game already being played")
     else:
         taggedID = str(re.sub(r'[^\w]', '', other))
+        if not await isValidID(taggedID):
+            await ctx.send('That is not a valid user')
+            return
         taggerID = str(ctx.author.id)
         botID = str(bot.user.id)
         if (taggedID == taggerID):
