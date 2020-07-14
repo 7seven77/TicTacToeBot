@@ -115,4 +115,6 @@ async def play(ctx, move):
     bot.board = board
     bot.turn *= -1;
     await showBoardState(ctx)
+    if len(bot.validMoves) == 0:
+        bot.board = None
 bot.run(TOKEN)
