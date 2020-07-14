@@ -9,7 +9,17 @@ from dotenv import load_dotenv
 
 # Return the board in a printable format
 def getBoard():
-    return 'Not implemented'
+    newRow = 0;
+    display = '';
+    for character in bot.board:
+        if character == '.':
+            display += ':white_large_square:'
+        else:
+            display += ':' + character + ':'
+        newRow += 1
+        if (newRow % 3) == 0:
+            display += "\n"
+    return display
     
 # This is what a command must start with
 botPrefix = '7'
@@ -47,7 +57,7 @@ async def start(ctx, other):
     if bot.board != None:
         await ctx.send("There is a game already being played")
     else:
-        bot.board = '.........'
+        bot.board = '.o..x..o.'
         await ctx.send('Starting a game')
 
 bot.run(TOKEN)
