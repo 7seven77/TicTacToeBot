@@ -26,9 +26,14 @@ def getBoard():
         if (newRow % 3) == 0:
             display += "\n"
     return display
+
+# Returns a string representing the ID of the mention
+def extractID(mention):
+    return str(re.sub(r'[^\w]', '', mention))
     
 ## async functions
 
+# Shows the state of the game to the user
 async def showBoardState(ctx):
     if bot.match == None:
         await ctx.send("No game is being played")
@@ -37,6 +42,7 @@ async def showBoardState(ctx):
         await ctx.send('Its ' + user.mention + 's turn')
         await ctx.send(getBoard())
 
+# Returns true if the ID given is a valid user
 async def isValidID(test):
     try:
         user = await bot.fetch_user(test)
@@ -81,7 +87,7 @@ async def start(ctx, other):
     if bot.match != None:
         await ctx.send("There is a game already being played")
     else:
-        taggedID = str(re.sub(r'[^\w]', '', other))
+        taggedID = extractID(other)
         if not await isValidID(taggedID):
             await ctx.send('That is not a valid user')
             return
