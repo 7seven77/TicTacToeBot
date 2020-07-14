@@ -18,6 +18,7 @@ def victory(string):
     for combo in win:
         if string[combo[0] - 1] == string[combo[1] - 1] and string[combo[0] - 1] == string[combo[2] - 1] and string[combo[2] - 1] != '.':
             return string[combo[0] - 1]
+    return '.'
 
 # Return the board in a printable format
 def getBoard():
@@ -128,6 +129,15 @@ async def play(ctx, move):
     bot.board = board
     bot.turn *= -1;
     await showBoardState(ctx)
+    victor = victory(bot.board)
+    if victor != '.':
+        if bot.turn == -1:
+            user = await bot.fetch_user(bot.opponent)
+        else:
+            user = await bot.fetch_user(bot.challenger)
+        bot.board = None
+        await ctx.send('{} has won'.format(user.mention))
     if len(bot.validMoves) == 0:
         bot.board = None
+        await ctx.send('The game is a draw')
 bot.run(TOKEN)
