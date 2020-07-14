@@ -1,6 +1,7 @@
 # bot.py
 import os
 import random
+import re
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -57,7 +58,16 @@ async def start(ctx, other):
     if bot.board != None:
         await ctx.send("There is a game already being played")
     else:
-        bot.board = '.o..x..o.'
+        taggedID = str(re.sub(r'[^\w]', '', other))
+        taggerID = str(ctx.author.id)
+        botID = str(bot.user.id)
+        if (taggedID == taggerID):
+            await ctx.send('You cannot tag yourself')
+            return
+        elif (taggedID == botID):
+            await ctx.send('Sorry, I don\'t know how to play');
+            return
+        bot.board = '.........'
         await ctx.send('Starting a game')
 
 bot.run(TOKEN)
