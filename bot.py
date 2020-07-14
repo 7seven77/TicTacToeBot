@@ -67,8 +67,11 @@ async def status(ctx):
     await showBoardState(ctx)
 
 # Start a game
-@bot.command(name='start', help='Start a game')
+@bot.command(name='start', help='Start a game (Tag a user)')
 async def start(ctx, other):
+    if other == 'help':
+        await ctx.send('''```7start @user\n@user - Tag the user you would like to play with```''')
+        return
     if bot.match != None:
         await ctx.send("There is a game already being played")
     else:
@@ -86,8 +89,11 @@ async def start(ctx, other):
         await showBoardState(ctx)
 
 # Play the game
-@bot.command(name='play', help='Take your turn')
+@bot.command(name='play', help='Take your turn (The move you want to play)')
 async def play(ctx, move):
+    if move == 'help':
+        await ctx.send('''```7play move\nmove - Enter a valid move, where you would like to place your token```Enter the number that correspond to the cell you want to play your token at:\n:one: :two: :three:\n:four: :five: :six:\n:seven: :eight: :nine:''')
+        return
     if bot.match == None:
         await ctx.send('No one has started a game')
         return
