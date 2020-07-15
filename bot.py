@@ -136,6 +136,10 @@ async def surrender(ctx):
     if bot.match == None:
         await ctx.send('There is no game being played')
         return
+    user = str(ctx.author.id)
+    if not (user == bot.match.challenger or user == bot.match.opponent):
+        await ctx.send('You are not in this game')
+        return
     bot.match = None
     await ctx.send('{} has lost the game'.format(ctx.author.mention))
 bot.run(TOKEN)
