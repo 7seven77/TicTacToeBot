@@ -129,4 +129,10 @@ async def play(ctx, move):
                 await ctx.send('{} wins the game'.format(user.mention))
         else:
             await showBoardState(ctx)
+
+# Forfeit the match
+@bot.command(name='surrender', help='Give up and lose the match')
+async def surrender(ctx):
+    bot.match = None
+    await ctx.send('{} has lost the game'.format(ctx.author.mention))
 bot.run(TOKEN)
