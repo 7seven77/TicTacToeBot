@@ -1,3 +1,4 @@
 # Don't upload private information (Etc. the bot's token)
 .env
 __pycache__
+*.db
