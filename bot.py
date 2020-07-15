@@ -133,6 +133,9 @@ async def play(ctx, move):
 # Forfeit the match
 @bot.command(name='surrender', help='Give up and lose the match')
 async def surrender(ctx):
+    if bot.match == None:
+        await ctx.send('There is no game being played')
+        return
     bot.match = None
     await ctx.send('{} has lost the game'.format(ctx.author.mention))
 bot.run(TOKEN)
