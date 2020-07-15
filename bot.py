@@ -140,6 +140,9 @@ async def surrender(ctx):
     if not (user == bot.match.challenger or user == bot.match.opponent):
         await ctx.send('You are not in this game')
         return
+    players = bot.match.getPlayers()
+    players.remove(user)
+    winner = players[0]
     bot.match = None
-    await ctx.send('{} has lost the game'.format(ctx.author.mention))
+    await ctx.send('{} has won the game'.format((await bot.fetch_user(winner)).mention))
 bot.run(TOKEN)
