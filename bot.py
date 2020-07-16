@@ -98,6 +98,9 @@ async def hello(ctx):
 # Displays the status of the game
 @bot.command(name='status', help='Show the status of the game')
 async def status(ctx):
+    if bot.acceptorID != None:
+        await ctx.send('{} must accept or decline the challenge'.format((await getUser(bot.acceptorID)).mention))
+        return
     await showBoardState(ctx)
 
 #####
