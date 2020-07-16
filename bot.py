@@ -154,6 +154,23 @@ async def accept(ctx):
     await showBoardState(ctx)
 
 #####
+
+# Decline a challenge
+@bot.command(name='decline', help='Decline the challenge')
+async def decline(ctx):
+    if bot.match != None:
+        await ctx.send("There is a game already being played")
+        return
+    if bot.acceptorID == None:
+        await ctx.send('There is no game proposol active')
+        return
+    if (str(ctx.author.id) != bot.acceptorID):
+        await ctx.send('You cannot decline the challenge')
+        return
+    bot.acceptorID = None
+    bot.challengerID = None
+    await ctx.send('You have declined the challenge')
+#####
         
 # Play the game
 @bot.command(name='play', help='Take your turn (The move you want to play)')
