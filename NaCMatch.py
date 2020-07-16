@@ -69,6 +69,10 @@ class NaCMatch():
                         return self.challenger
         return '.'
 
+    # Returns a list with the players in the match
+    def getPlayers(self):
+        return [self.challenger, self.opponent]
+    
     # Returns True if the game is complete
     def isOver(self):
         return len(self.validMoves) == 0 or self.getVictor() != '.'
@@ -78,6 +82,7 @@ class NaCMatch():
         self.turn *= -1
 
     # Use only for tests
+    # Does not affect validMoves
     def setBoard(self, newBoard):
         self.board = newBoard
 
