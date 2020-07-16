@@ -81,6 +81,7 @@ bot.match = None
 @bot.event
 async def on_ready():
     bot.acceptorID = None
+    bot.challengerID = None
     await bot.change_presence(activity=discord.Game(name="Noughts and Crosses 7help"))
     print("Ready")
 
@@ -130,8 +131,28 @@ async def start(ctx, other):
             await ctx.send('Sorry, I don\'t know how to play');
             return
         bot.acceptorID = taggedID
+        bot.challengerID = taggerID
         await ctx.send('{} has challenged {} to a match!'.format((await getUser(taggerID)).mention, (await getUser(taggedID)).mention))
         await ctx.send('Use the command \'7accept\' to start the match or \'7decline\' to reject the proposal')
+
+#####
+
+# Accept a challenge
+@bot.command(name='accept', help='Accept the challenge and start a match')
+async def accept(ctx):
+    if bot.match != None:
+        await ctx.send("There is a game already being played")
+        return
+    if bot.acceptorID == None:
+        await ctx.send('There is no game proposol active')
+        return
+    if (str(ctx.author.id) != bot.acceptorID):
+        await ctx.send('You cannot accept the challenge')
+        return
+    bot.match = NaCMatch(bot.challengerID, bot.acceptorID)
+    await ctx.send('Starting a game')
+    await showBoardState(ctx)
+
 #####
         
 # Play the game
