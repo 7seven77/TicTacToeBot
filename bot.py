@@ -194,6 +194,8 @@ async def play(ctx, move):
                 await ctx.send('The match is a draw')
             else:
                 bot.match = None
+                bot.acceptorID = None
+                bot.challengerID = None
                 user = await getUser(winner)
                 await ctx.send('{} wins the game'.format(user.mention))
         else:
@@ -215,6 +217,8 @@ async def surrender(ctx):
     players.remove(user)
     winner = players[0]
     bot.match = None
+    bot.acceptorID = None
+    bot.challengerID = None
     await ctx.send('{} has won the game'.format((await getUser(winner)).mention))
 
 bot.run(TOKEN)
