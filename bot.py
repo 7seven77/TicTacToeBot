@@ -80,6 +80,7 @@ bot.match = None
 # Initialise the bot when it first becomes ready
 @bot.event
 async def on_ready():
+    bot.acceptorID = None
     await bot.change_presence(activity=discord.Game(name="Noughts and Crosses 7help"))
     print("Ready")
 
@@ -109,6 +110,9 @@ async def start(ctx, other):
         return
     if bot.match != None:
         await ctx.send("There is a game already being played")
+        return
+    if bot.acceptorID != None:
+        await ctx.send('There is already a game proposol active')
     else:
         taggedID = extractID(other)
         if not await isValidID(taggedID):
@@ -122,10 +126,9 @@ async def start(ctx, other):
         elif (taggedID == botID):
             await ctx.send('Sorry, I don\'t know how to play');
             return
-        bot.match = NaCMatch(taggerID, taggedID)
-        await ctx.send('Starting a game')
-        await showBoardState(ctx)
-
+        bot.acceptorID = taggedID
+        await ctx.send('{} has challenged {} to a match!'.format((await getUser(taggerID)).mention, (await getUser(taggedID)).mention))
+        await ctx.send('Use the command \'7accept\' to start the match or \'7decline\' to reject the proposal')
 #####
         
 # Play the game
