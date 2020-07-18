@@ -80,6 +80,8 @@ bot.match = None
 # Initialise the bot when it first becomes ready
 @bot.event
 async def on_ready():
+    bot.acceptorID = None
+    bot.challengerID = None
     await bot.change_presence(activity=discord.Game(name="Noughts and Crosses 7help"))
     print("Ready")
 
@@ -97,6 +99,9 @@ async def hello(ctx):
 # Displays the status of the game
 @bot.command(name='status', help='Show the status of the game')
 async def status(ctx):
+    if bot.acceptorID != None:
+        await ctx.send('{} must accept or decline the challenge'.format((await getUser(bot.acceptorID)).mention))
+        return
     await showBoardState(ctx)
 
 #####
@@ -109,6 +114,9 @@ async def start(ctx, other):
         return
     if bot.match != None:
         await ctx.send("There is a game already being played")
+        return
+    if bot.acceptorID != None:
+        await ctx.send('There is already a game proposal active')
     else:
         taggedID = extractID(other)
         if not await isValidID(taggedID):
@@ -122,10 +130,46 @@ async def start(ctx, other):
         elif (taggedID == botID):
             await ctx.send('Sorry, I don\'t know how to play');
             return
-        bot.match = NaCMatch(taggerID, taggedID)
-        await ctx.send('Starting a game')
-        await showBoardState(ctx)
+        bot.acceptorID = taggedID
+        bot.challengerID = taggerID
+        await ctx.send('{} has challenged {} to a match!'.format((await getUser(taggerID)).mention, (await getUser(taggedID)).mention))
+        await ctx.send('Use the command \'7accept\' to start the match or \'7decline\' to reject the proposal')
 
+#####
+
+# Accept a challenge
+@bot.command(name='accept', help='Accept the challenge and start a match')
+async def accept(ctx):
+    if bot.match != None:
+        await ctx.send("There is a game already being played")
+        return
+    if bot.acceptorID == None:
+        await ctx.send('There is no game proposol active')
+        return
+    if (str(ctx.author.id) != bot.acceptorID):
+        await ctx.send('You cannot accept the challenge')
+        return
+    bot.match = NaCMatch(bot.challengerID, bot.acceptorID)
+    await ctx.send('Starting a game')
+    await showBoardState(ctx)
+
+#####
+
+# Decline a challenge
+@bot.command(name='decline', help='Decline the challenge')
+async def decline(ctx):
+    if bot.match != None:
+        await ctx.send("There is a game already being played")
+        return
+    if bot.acceptorID == None:
+        await ctx.send('There is no game proposol active')
+        return
+    if (str(ctx.author.id) != bot.acceptorID):
+        await ctx.send('You cannot decline the challenge')
+        return
+    bot.acceptorID = None
+    bot.challengerID = None
+    await ctx.send('You have declined the challenge')
 #####
         
 # Play the game
@@ -150,6 +194,8 @@ async def play(ctx, move):
                 await ctx.send('The match is a draw')
             else:
                 bot.match = None
+                bot.acceptorID = None
+                bot.challengerID = None
                 user = await getUser(winner)
                 await ctx.send('{} wins the game'.format(user.mention))
         else:
@@ -171,6 +217,8 @@ async def surrender(ctx):
     players.remove(user)
     winner = players[0]
     bot.match = None
+    bot.acceptorID = None
+    bot.challengerID = None
     await ctx.send('{} has won the game'.format((await getUser(winner)).mention))
 
 bot.run(TOKEN)
