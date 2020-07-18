@@ -116,7 +116,7 @@ async def start(ctx, other):
         await ctx.send("There is a game already being played")
         return
     if bot.acceptorID != None:
-        await ctx.send('There is already a game proposol active')
+        await ctx.send('There is already a game proposal active')
     else:
         taggedID = extractID(other)
         if not await isValidID(taggedID):
